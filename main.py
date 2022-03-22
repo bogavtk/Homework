@@ -79,7 +79,7 @@ def append_brakets(file_new, list_):
 def check_brakets(check_file):
     stack = []
     list_ = []
-    append_brakets(check_file, list_)
+    append_brakets(check_file,list_)
     for ch in list_:
         if ch in open_brakets:
             stack.append(ch)
