@@ -1,18 +1,48 @@
 import os
+import shutil
 
 import requests
 
-result = requests.get("https://reqres.in/api/users?page=2")
-dir_path = r"C:\Users\bogda\PycharmProjects\pythonProject7\users_data"
-get_data = result.json()['data']
+response = requests.get('https://reqres.in/api/users?page=2')
+data_ = response.json()['data']
+path_ = r"C:\Users\bogda\PycharmProjects\Homeworks\users_data"
 
-for i in range(len(get_data)):
-    users_id_path = dir_path + str(get_data[i]['id'])
-    os.mkdir(users_id_path)
-    with open(users_id_path + "/avatar.jpg", 'wb') as image_file:
-        image_file.write(b'get_data[i]["avatar"]')
-    with open(users_id_path + "/user_info.txt", 'w') as f:
-        f.writelines(f"{str(get_data[i]['first_name'])}, "
-                     f"{str(get_data[i]['last_name'])},"
-                     f"{str(get_data[i]['email'])}")
 
+def get_img(count):
+    return requests.get(data_[count]['avatar'], stream=True)
+
+
+def get_path(count):
+    return str(data_[count]['id'])
+
+
+def write_users(path, count):
+    with open(path + "/user_info.txt", "w") as file:
+        file.writelines(f"{str(data_[count]['email'])}, "
+                        f"{str(data_[count]['first_name'])} {str(data_[count]['last_name'])}")
+
+
+def get_avatar(path, img):
+    with open(path + '/avatar.png', 'wb') as f:
+        shutil.copyfileobj(img.raw, f)
+
+
+def get_data(need_path):
+    for i in range(len(data_)):
+        img = get_img(i)
+        path = need_path + get_path(i)
+        try:
+            if not os.path.exists(path):
+                os.mkdir(path)
+            get_avatar(path, img)
+            write_users(path, i)
+        except OSError:
+            continue
+
+
+def main():
+    get_data(path_)
+
+
+if __name__ == "__main__":
+    main()
